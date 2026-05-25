@@ -1,0 +1,5 @@
+# https://aixart12.github.io/nh-bill-analyzer/
+User-agent: *
+Allow: /
+
+Sitemap: https://aixart12.github.io/nh-bill-analyzer/sitemap.xml

@@ -63,7 +63,15 @@ Open `http://localhost:5173` and drop your hospital bill PDF.
 npm run build
 ```
 
-Output goes to `dist/` — deploy anywhere (Vercel, Netlify, GitHub Pages, etc.)
+Output goes to `dist/` — deploy anywhere (GitHub Pages, Cloudflare Pages, Firebase Hosting, etc.)
+
+### SEO
+
+The app includes meta tags, Open Graph / Twitter cards, JSON-LD structured data, `public/robots.txt`, and `public/sitemap.xml`. Canonical and social URLs default to:
+
+`https://aixart12.github.io/nh-bill-analyzer/`
+
+If you deploy to a custom domain, update URLs in `index.html`, `public/robots.txt`, and `public/sitemap.xml`.
 
 ## 🏥 Supported Hospitals
 
