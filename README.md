@@ -10,9 +10,32 @@ A privacy-first, browser-based tool to analyze hospital bills from **Narayana He
 
 ---
 
+## 📸 Screenshots
+
+### Overview — financial summary & top expenses
+
+See gross total, discount, net payable, deposit, and balance due at a glance. Interactive donut chart for top expense categories and a daily spend bar chart across the admission period.
+
+![Bill Analysis Overview](docs/screenshots/overview.png)
+
+### Categories — full breakdown across all bill sections
+
+Horizontal bar chart ranking all 16+ categories (Surgery, Laboratory, Bed Charges, etc.) with expandable cards showing amount, percentage of total, and line-item counts.
+
+![All Categories Breakdown](docs/screenshots/categories.png)
+
+### Timeline — day-by-day spend drill-down
+
+Track spending over each day of hospitalization. Each day lists category-wise charges with icons and amounts (e.g. Surgery, Radiology, Lab, Bed Charges).
+
+![Daily Spend Timeline](docs/screenshots/timeline.png)
+
+---
+
 ## ✨ Features
 
-- **📊 Category-wise Breakdown** — Surgery, Lab, Radiology, Medicines, Bed Charges, etc. with interactive pie & bar charts
+- **📊 Category-wise Breakdown** — Surgery, Lab, Radiology, Medicines, Bed Charges, and 12+ more categories with interactive pie & bar charts
+- **💰 Financial Summary** — Gross total, discount, net payable, deposited amount, and balance due
 - **📅 Date-wise Timeline** — See how much was spent each day, with per-category drill-down
 - **🔍 Line Item Details** — Click any category to see individual charges
 - **🔒 100% Private** — PDF parsing happens entirely in the browser using PDF.js. No server, no uploads, no tracking.
