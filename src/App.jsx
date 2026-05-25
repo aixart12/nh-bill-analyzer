@@ -349,6 +349,110 @@ const TT = ({ active, payload }) => {
   );
 };
 
+function PrivacyBanner({ compact = false }) {
+  const points = compact
+    ? ["No server upload", "Nothing saved", "Memory only"]
+    : [
+        "Your PDF is never uploaded to any server",
+        "We do not save your bill, name, or amounts anywhere",
+        "Analysis runs only in this browser tab — data clears when you leave",
+      ];
+
+  return (
+    <div
+      style={{
+        background: "linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.04) 100%)",
+        border: "1px solid rgba(34,197,94,0.35)",
+        borderRadius: compact ? 10 : 14,
+        padding: compact ? "10px 14px" : "16px 18px",
+        textAlign: "left",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: compact ? "center" : "flex-start",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontSize: compact ? 18 : 22,
+            lineHeight: 1,
+            flexShrink: 0,
+          }}
+          aria-hidden
+        >
+          🔒
+        </span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: compact ? 12 : 14,
+              fontWeight: 700,
+              color: "#4ade80",
+              marginBottom: compact ? 0 : 6,
+              letterSpacing: compact ? 0 : 0.2,
+            }}
+          >
+            {compact
+              ? "We don't save any of your data"
+              : "We don't save any of your data — ever"}
+          </div>
+          {!compact && (
+            <p
+              style={{
+                margin: "0 0 10px",
+                fontSize: 12,
+                color: "#86efac",
+                lineHeight: 1.5,
+              }}
+            >
+              No account. No database. No cloud storage. Your hospital bill
+              stays on your device.
+            </p>
+          )}
+          <ul
+            style={{
+              margin: 0,
+              padding: 0,
+              listStyle: "none",
+              display: compact ? "flex" : "block",
+              flexWrap: "wrap",
+              gap: compact ? "6px 14px" : 6,
+            }}
+          >
+            {points.map((text, i) => (
+              <li
+                key={i}
+                style={{
+                  fontSize: compact ? 11 : 12,
+                  color: compact ? "#94a3b8" : "#cbd5e1",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                <span
+                  style={{
+                    color: "#22c55e",
+                    fontWeight: 700,
+                    fontSize: compact ? 10 : 12,
+                  }}
+                >
+                  ✓
+                </span>
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════
    MAIN APP COMPONENT
    ═══════════════════════════════════════════════════════ */
@@ -458,15 +562,19 @@ export default function App() {
             style={{
               fontSize: 15,
               color: "#64748b",
-              margin: "0 0 8px",
+              margin: "0 0 20px",
               lineHeight: 1.6,
             }}
           >
-            Upload your Narayana Health / NH hospital bill PDF.
-            <br />
-            Everything runs in your browser — no data leaves your device.
+            Upload your Narayana Health / NH hospital bill PDF for instant
+            visual breakdowns.
           </p>
-          <p style={{ fontSize: 12, color: "#475569", margin: "0 0 40px" }}>
+
+          <div style={{ marginBottom: 24 }}>
+            <PrivacyBanner />
+          </div>
+
+          <p style={{ fontSize: 12, color: "#475569", margin: "0 0 32px" }}>
             Works with Rabindranath Tagore IICS, Narayana Hrudayalaya,
             Mazumdar Shaw, and all NH network hospitals
           </p>
@@ -643,9 +751,6 @@ export default function App() {
             </div>
           </div>
 
-          <p style={{ fontSize: 11, color: "#334155", marginTop: 24 }}>
-            🔒 100% private — your PDF is processed locally in the browser
-          </p>
         </div>
       </div>
     );
@@ -668,6 +773,17 @@ export default function App() {
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet"
       />
+
+      {/* Privacy — visible on every dashboard view */}
+      <div
+        style={{
+          padding: "12px 28px 0",
+          background: "rgba(34,197,94,0.04)",
+          borderBottom: "1px solid rgba(34,197,94,0.15)",
+        }}
+      >
+        <PrivacyBanner compact />
+      </div>
 
       {/* Header */}
       <div
@@ -1477,9 +1593,13 @@ export default function App() {
           textAlign: "center",
         }}
       >
+        <p style={{ fontSize: 11, color: "#64748b", margin: "0 0 4px" }}>
+          <span style={{ color: "#4ade80", fontWeight: 600 }}>🔒 No data saved</span>
+          {" "}— your bill is not stored on any server, database, or disk. Analysis
+          exists only in this browser session.
+        </p>
         <p style={{ fontSize: 11, color: "#334155", margin: 0 }}>
-          Provisional Bill • Processed locally in your browser • No data
-          uploaded anywhere •{" "}
+          Provisional Bill • 100% client-side •{" "}
           <a
             href="https://github.com"
             style={{ color: "#475569" }}
