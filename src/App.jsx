@@ -1,4 +1,5 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import "./App.css";
 import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
   Tooltip, ResponsiveContainer
@@ -325,6 +326,20 @@ const CHART_COLORS = [
   "#6D6875", "#A8DADC", "#90BE6D", "#CDB4DB",
 ];
 
+function useBreakpoint() {
+  const [wide, setWide] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const fn = () => setWide(mq.matches);
+    fn();
+    mq.addEventListener("change", fn);
+    return () => mq.removeEventListener("change", fn);
+  }, []);
+  return wide;
+}
+
 const TT = ({ active, payload }) => {
   if (!active || !payload?.[0]) return null;
   const d = payload[0].payload;
@@ -457,6 +472,7 @@ function PrivacyBanner({ compact = false }) {
    MAIN APP COMPONENT
    ═══════════════════════════════════════════════════════ */
 export default function App() {
+  const wide = useBreakpoint();
   const [bill, setBill] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -523,41 +539,15 @@ export default function App() {
   /* ─────────── UPLOAD SCREEN ─────────── */
   if (!bill) {
     return (
-      <div
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          background:
-            "linear-gradient(160deg, #0a0a14 0%, #111827 40%, #0f172a 100%)",
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 24,
-          color: "#e0e0e0",
-        }}
-      >
+      <div className="app-shell upload-shell">
         <link
           href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@700;800&display=swap"
           rel="stylesheet"
         />
 
-        <div style={{ textAlign: "center", maxWidth: 520, width: "100%" }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🏥</div>
-          <h1
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: 36,
-              fontWeight: 800,
-              margin: "0 0 8px",
-              letterSpacing: "-1px",
-              background: "linear-gradient(135deg, #fff 0%, #94a3b8 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Hospital Bill Analyzer
-          </h1>
+        <div className="upload-inner">
+          <div style={{ fontSize: wide ? 48 : 40, marginBottom: 16 }}>🏥</div>
+          <h1 className="upload-title">Hospital Bill Analyzer</h1>
           <p
             style={{
               fontSize: 15,
@@ -597,15 +587,12 @@ export default function App() {
               inp.onchange = (e) => handleFile(e.target.files[0]);
               inp.click();
             }}
+            className="upload-dropzone"
             style={{
               border: `2px dashed ${dragging ? "#3b82f6" : "#334155"}`,
-              borderRadius: 20,
-              padding: "60px 40px",
-              cursor: "pointer",
               background: dragging
                 ? "rgba(59,130,246,0.05)"
                 : "rgba(255,255,255,0.02)",
-              transition: "all 0.3s ease",
             }}
           >
             {loading ? (
@@ -722,13 +709,7 @@ export default function App() {
             >
               What you'll get
             </h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 10,
-              }}
-            >
+            <div className="upload-features">
               {[
                 "Category-wise spend breakdown",
                 "Date-wise expense timeline",
@@ -759,56 +740,32 @@ export default function App() {
   /* ─────────── DASHBOARD ─────────── */
   const top6 = catData.slice(0, 6);
 
+  const pieOuter = wide ? 95 : 72;
+  const pieInner = wide ? 50 : 38;
+  const catChartMargin = wide
+    ? { left: 130, right: 30, top: 5, bottom: 5 }
+    : { left: 4, right: 8, top: 5, bottom: 5 };
+  const catYAxisWidth = wide ? 120 : 72;
+
   return (
-    <div
-      style={{
-        fontFamily: "'DM Sans', sans-serif",
-        background:
-          "linear-gradient(160deg, #0a0a14 0%, #111827 40%, #0f172a 100%)",
-        minHeight: "100vh",
-        color: "#e0e0e0",
-      }}
-    >
+    <div className="app-shell">
       <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet"
       />
 
-      {/* Privacy — visible on every dashboard view */}
-      <div
-        style={{
-          padding: "12px 28px 0",
-          background: "rgba(34,197,94,0.04)",
-          borderBottom: "1px solid rgba(34,197,94,0.15)",
-        }}
-      >
+      <div className="dash-privacy">
         <PrivacyBanner compact />
       </div>
 
-      {/* Header */}
-      <div
-        style={{
-          padding: "24px 28px 18px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
+      <div className="dash-header">
+        <div className="dash-header-row">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <h1
-                style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#fff" }}
-              >
-                🏥 Bill Analysis
-              </h1>
+            <div className="dash-header-top">
+              <h1 className="dash-header-title">🏥 Bill Analysis</h1>
               <button
+                type="button"
+                className="touch-btn"
                 onClick={() => {
                   setBill(null);
                   setError(null);
@@ -817,7 +774,7 @@ export default function App() {
                   background: "rgba(255,255,255,0.06)",
                   border: "none",
                   color: "#64748b",
-                  padding: "5px 12px",
+                  padding: "8px 14px",
                   fontSize: 12,
                   borderRadius: 6,
                   cursor: "pointer",
@@ -832,45 +789,26 @@ export default function App() {
                 fontSize: 12,
                 color: "#64748b",
                 fontFamily: "'Space Mono', monospace",
+                wordBreak: "break-word",
               }}
             >
               {bill.patient} • MRN: {bill.mrn}
             </p>
           </div>
-          <div style={{ textAlign: "right", fontSize: 12 }}>
-            <div
-              style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: 11,
-                color: "#475569",
-              }}
-            >
+          <div className="dash-header-meta">
+            <div className="dash-header-meta-block" style={{ color: "#475569" }}>
               #{bill.billNo}
             </div>
-            <div style={{ color: "#64748b", marginTop: 2 }}>
+            <div className="dash-header-meta-block">
               {bill.admDate} → {bill.billDate}
             </div>
-            <div
-              style={{
-                color: "#E63946",
-                fontWeight: 600,
-                fontSize: 11,
-                marginTop: 2,
-              }}
-            >
-              {days} DAYS
+            <div className="dash-header-meta-block">
+              <strong>{days} DAYS</strong>
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 20,
-            marginTop: 12,
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="dash-ward-row">
           {[
             ["Ward", bill.ward],
             ["Doctors", bill.doctors.join(", ")],
@@ -889,7 +827,11 @@ export default function App() {
                     {l}
                   </span>
                   <div
-                    style={{ color: "#94a3b8", marginTop: 1, maxWidth: 300 }}
+                    style={{
+                      color: "#94a3b8",
+                      marginTop: 1,
+                      wordBreak: "break-word",
+                    }}
                   >
                     {v}
                   </div>
@@ -899,15 +841,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
-          gap: 10,
-          padding: "16px 28px",
-        }}
-      >
+      <div className="dash-summary">
         {[
           { label: "Gross Total", value: fmt(bill.gross), accent: "#E63946" },
           {
@@ -940,11 +874,12 @@ export default function App() {
             </div>
             <div
               style={{
-                fontSize: 17,
+                fontSize: wide ? 17 : 15,
                 fontWeight: 700,
                 color: "#fff",
                 marginTop: 4,
                 fontFamily: "'Space Mono', monospace",
+                wordBreak: "break-word",
               }}
             >
               {c.value}
@@ -953,34 +888,17 @@ export default function App() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 4,
-          padding: "0 28px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+      <div className="dash-tabs" role="tablist">
         {["overview", "categories", "timeline"].map((t) => (
           <button
             key={t}
+            type="button"
+            role="tab"
+            aria-selected={view === t}
+            className={`dash-tab${view === t ? " dash-tab--active" : ""}`}
             onClick={() => {
               setView(t);
               setSelectedCat(null);
-            }}
-            style={{
-              background:
-                view === t ? "rgba(255,255,255,0.08)" : "transparent",
-              border: "none",
-              color: view === t ? "#fff" : "#64748b",
-              padding: "10px 18px",
-              fontSize: 13,
-              fontWeight: 500,
-              cursor: "pointer",
-              borderRadius: "8px 8px 0 0",
-              textTransform: "capitalize",
-              fontFamily: "'DM Sans', sans-serif",
             }}
           >
             {t}
@@ -988,44 +906,21 @@ export default function App() {
         ))}
       </div>
 
-      <div style={{ padding: "20px 28px" }}>
+      <div className="dash-content">
         {/* ─── OVERVIEW ─── */}
         {view === "overview" && (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 20,
-            }}
-          >
-            <div
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                borderRadius: 14,
-                padding: 20,
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                Top Expenses
-              </h3>
-              <ResponsiveContainer width="100%" height={260}>
+          <div className="overview-grid">
+            <div className="chart-card">
+              <h3>Top Expenses</h3>
+              <ResponsiveContainer width="100%" height={wide ? 260 : 220}>
                 <PieChart>
                   <Pie
                     data={top6}
                     dataKey="amount"
                     cx="50%"
                     cy="50%"
-                    outerRadius={95}
-                    innerRadius={50}
+                    outerRadius={pieOuter}
+                    innerRadius={pieInner}
                     strokeWidth={2}
                     stroke="#0a0a14"
                     onClick={(_, i) =>
@@ -1087,28 +982,19 @@ export default function App() {
               </div>
             </div>
 
-            <div
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                borderRadius: 14,
-                padding: 20,
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                Daily Spend
-              </h3>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={dateData}>
-                  <XAxis dataKey="label" stroke="#475569" fontSize={11} />
+            <div className="chart-card">
+              <h3>Daily Spend</h3>
+              <ResponsiveContainer width="100%" height={wide ? 280 : 220}>
+                <BarChart data={dateData} margin={{ left: -8, right: 4 }}>
+                  <XAxis
+                    dataKey="label"
+                    stroke="#475569"
+                    fontSize={wide ? 11 : 9}
+                    interval={wide ? "preserveStartEnd" : 0}
+                    angle={wide ? 0 : -35}
+                    textAnchor={wide ? "middle" : "end"}
+                    height={wide ? 30 : 48}
+                  />
                   <YAxis
                     tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
                     stroke="#334155"
@@ -1216,48 +1102,35 @@ export default function App() {
         {/* ─── CATEGORIES ─── */}
         {view === "categories" && (
           <div>
-            <div
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                borderRadius: 14,
-                padding: 20,
-                marginBottom: 20,
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                All Categories ({catData.length})
-              </h3>
+            <div className="chart-card" style={{ marginBottom: 20 }}>
+              <h3>All Categories ({catData.length})</h3>
               <ResponsiveContainer
                 width="100%"
-                height={Math.max(300, catData.length * 32)}
+                height={Math.max(wide ? 300 : 240, catData.length * (wide ? 32 : 28))}
               >
                 <BarChart
                   data={catData}
                   layout="vertical"
-                  margin={{ left: 130, right: 30, top: 5, bottom: 5 }}
+                  margin={catChartMargin}
                 >
                   <XAxis
                     type="number"
                     tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
                     stroke="#334155"
-                    fontSize={11}
+                    fontSize={wide ? 11 : 9}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
                     stroke="#475569"
-                    fontSize={11}
-                    width={120}
+                    fontSize={wide ? 11 : 9}
+                    width={catYAxisWidth}
                     tick={{ fill: "#94a3b8" }}
+                    tickFormatter={(name) =>
+                      wide || name.length <= 14
+                        ? name
+                        : `${name.slice(0, 12)}…`
+                    }
                   />
                   <Tooltip content={<TT />} />
                   <Bar dataKey="amount" radius={[0, 4, 4, 0]}>
@@ -1269,13 +1142,7 @@ export default function App() {
               </ResponsiveContainer>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: 12,
-              }}
-            >
+            <div className="cat-grid">
               {catData.map((cat, i) => (
                 <div
                   key={i}
@@ -1435,29 +1302,19 @@ export default function App() {
         {/* ─── TIMELINE ─── */}
         {view === "timeline" && (
           <div>
-            <div
-              style={{
-                background: "rgba(255,255,255,0.02)",
-                borderRadius: 14,
-                padding: 20,
-                marginBottom: 20,
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 16px",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
-                Spend Over {days} Days
-              </h3>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={dateData}>
-                  <XAxis dataKey="label" stroke="#475569" fontSize={11} />
+            <div className="chart-card" style={{ marginBottom: 20 }}>
+              <h3>Spend Over {days} Days</h3>
+              <ResponsiveContainer width="100%" height={wide ? 220 : 200}>
+                <BarChart data={dateData} margin={{ left: -8, right: 4 }}>
+                  <XAxis
+                    dataKey="label"
+                    stroke="#475569"
+                    fontSize={wide ? 11 : 9}
+                    interval={wide ? "preserveStartEnd" : 0}
+                    angle={wide ? 0 : -35}
+                    textAnchor={wide ? "middle" : "end"}
+                    height={wide ? 30 : 48}
+                  />
                   <YAxis
                     tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}K`}
                     stroke="#334155"
@@ -1508,22 +1365,8 @@ export default function App() {
                         border: "2px solid #0a0a14",
                       }}
                     />
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "baseline",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <h3
-                        style={{
-                          margin: 0,
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: "#fff",
-                        }}
-                      >
+                    <div className="timeline-day-header">
+                      <h3>
                         Day {di + 1} — {fmtDate(day.date)}
                       </h3>
                       <span
@@ -1585,14 +1428,7 @@ export default function App() {
         )}
       </div>
 
-      {/* Footer */}
-      <div
-        style={{
-          padding: "16px 28px",
-          borderTop: "1px solid rgba(255,255,255,0.06)",
-          textAlign: "center",
-        }}
-      >
+      <div className="dash-footer">
         <p style={{ fontSize: 11, color: "#64748b", margin: "0 0 4px" }}>
           <span style={{ color: "#4ade80", fontWeight: 600 }}>🔒 No data saved</span>
           {" "}— your bill is not stored on any server, database, or disk. Analysis
